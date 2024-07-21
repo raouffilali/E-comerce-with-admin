@@ -1,0 +1,40 @@
+/* applied to container */
+.custom-container {
+  background-color: none;
+  margin-top: 1rem;
+}
+ 
+/* applied to container when readying */
+.custom-container[data-state="readying"] {
+  background-color: none;
+}
+ 
+/* applied to button */
+.custom-button {
+
+  color: rgb(0 0 0 / 1);
+  background-color: rgb(45, 172, 92);
+}
+ 
+/* applied to button when uploading */
+.custom-button-uploading {
+  background-color:rgb(146, 229, 177);
+  color: rgb(0 0 0 / 0.5);
+  cursor: not-allowed;
+}
+ 
+.custom-button-uploading::after {
+  background-color: rgb(11, 119, 47) !important;
+}
+ 
+/* applied to the button when ready */
+.custom-button-ready {
+  color: #ecfdf5;
+}
+ 
+/* applied to the button when not ready */
+.custom-button-not-ready {
+  background-color: rgb(239 68 68 / 0.5);
+  color: rgb(0 0 0 / 0.5);
+  cursor: not-allowed;
+}

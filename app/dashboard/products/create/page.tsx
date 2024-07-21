@@ -1,12 +1,12 @@
 "use client";
-
-
+import "./create.css";
 import { UploadDropzone } from "@/app/lib/uploadthing";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -81,6 +81,15 @@ export default function ProductCreateRoute() {
             <div className="flex flex-col gap-3">
               <Label>Images</Label>
               <UploadDropzone
+                appearance={{
+                  button({ ready, isUploading }) {
+                    return `custom-button ${
+                      ready ? "custom-button-ready" : "custom-button-not-ready"
+                    } ${isUploading ? "custom-button-uploading" : ""}`;
+                  },
+                  container: "custom-container",
+                  allowedContent: "custom-allowed-content",
+                }}
                 endpoint="imageUploader"
                 onClientUploadComplete={(res) => {
                   alert("Image uploaded successfully");
@@ -92,6 +101,9 @@ export default function ProductCreateRoute() {
             </div>
           </div>
         </CardContent>
+        <CardFooter>
+          <Button>Create Product</Button>
+        </CardFooter>
       </Card>
     </form>
   );
