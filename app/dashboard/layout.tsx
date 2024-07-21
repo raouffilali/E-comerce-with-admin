@@ -58,6 +58,7 @@ async function DashboardLayout({ children }: { children: React.ReactNode }) {
           </DropdownMenuContent>
         </DropdownMenu>
       </header>
+      <main className="my-5 flex-grow">{children}</main>
     </div>
   );
 }
