@@ -1,3 +1,4 @@
+import prisma from "@/app/lib/db";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -23,10 +24,22 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { MoreHorizontal, PlusCircle, UserIcon } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-const ProductsRoute = () => {
+async function getData() {
+  const data = await prisma.product.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return data;
+}
+
+const ProductsRoute = async () => {
+  const data = await getData();
   return (
     <>
       <div className="flex mb-5 items-center justify-end">
@@ -57,33 +70,50 @@ const ProductsRoute = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell>
-                  <UserIcon className="h-16 w-16" />
-                </TableCell>
-                <TableCell>Nike air</TableCell>
-                <TableCell>Active</TableCell>
-                <TableCell>$299.00</TableCell>
-                <TableCell>2024-09-09</TableCell>
-                <TableCell className="text-end">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="icon" variant="ghost">
-                        <MoreHorizontal className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>
-                            Actions
-                        </DropdownMenuLabel>
+              {data.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell>
+                    <Image
+                      alt="Product image"
+                      src={item.images[0]}
+                      height={64}
+                      width={64}
+                      className="rounded-md object-cover h-16 w-16"
+                    />
+                  </TableCell>
+                  <TableCell>{item.name}</TableCell>
+                  <TableCell>{item.status}</TableCell>
+                  <TableCell>
+                    {item.price} {process.env.NEXT_PUBLIC_CURRENCY}
+                  </TableCell>
+                  <TableCell>
+                    {new Date(item.createdAt).toLocaleDateString("en-GB")}
+                  </TableCell>
+                  <TableCell className="text-end">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button size="icon" variant="ghost">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem>Delete</DropdownMenuItem>
-
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
+                        <DropdownMenuItem asChild>
+                          <Link href={`/dashboard/products/${item.id}`}>
+                            Edit
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href={`/dashboard/products/${item.id}/delete`}>
+                            Delete
+                          </Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </CardContent>
