@@ -35,7 +35,7 @@ function DashboardNavigation() {
           href={link.href}
           className={cn(
             link.href === pathname
-              ? "text-foreground  font-bold"
+              ? "text-primary  font-bold"
               : "text-muted-foreground opacity-80 hover:text-foreground"
           )}
         >
