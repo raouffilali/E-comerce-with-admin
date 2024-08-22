@@ -1,5 +1,9 @@
+"use client";
+
+import { createBanner, createProduct } from "@/app/actions";
 import { SubmitButton } from "@/app/components/SubmitButton";
 import { UploadDropzone } from "@/app/lib/uploadthing";
+import { bannerSchema } from "@/app/lib/zodSchemas";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,12 +15,31 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useForm } from "@conform-to/react";
+import { parseWithZod } from "@conform-to/zod";
 import { ChevronLeft } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import { useFormState } from "react-dom";
 
 export default function BannerRoute() {
+  const [image, setImages] = useState<string | undefined>(undefined);
+  const [lastResult, action] = useFormState(createBanner, undefined);
+
+  const [form, fields] = useForm({
+    lastResult,
+
+    onValidate({ formData }) {
+      return parseWithZod(formData, {
+        schema: bannerSchema,
+      });
+    },
+    shouldValidate: "onBlur",
+    shouldRevalidate: "onInput",
+  });
   return (
-    <form>
+    <form id={form.id} onSubmit={form.onSubmit} action={action}>
       <div className="flex items-center gap-x-4">
         <Button variant={"outline"} size={"icon"}>
           <Link href={"/dashboard/products"}>
@@ -34,16 +57,49 @@ export default function BannerRoute() {
           <div className="flex flex-col gap-y-6">
             <div className="flex flex-col gap-3">
               <Label>Name</Label>
-              <Input type="text" placeholder="Enter the name of the banner" />
+              <Input
+                type="text"
+                name={fields.title.name}
+                key={fields.title.key}
+                defaultValue={fields.title.initialValue}
+                placeholder="Enter the name of the banner"
+              />
+              <p className="text-red-500">{fields.title.errors}</p>
             </div>
             <div className="flex flex-col gap-3">
               <Label>Image</Label>
-              <UploadDropzone endpoint="bannerImageRoute" />
+              <input 
+              type="hidden"
+              value={image}
+              key={fields.imageString.key}
+              name={fields.imageString.name}
+              defaultValue={fields.imageString.initialValue}
+              />
+              {image !== undefined ? (
+                <Image
+                  src={image}
+                  alt="Banner Image"
+                  width={200}
+                  height={200}
+                  className="w-[200px] h-[200px] object-cover border rounded-lg"
+                />
+              ) : (
+                <UploadDropzone
+                  onClientUploadComplete={(res) => {
+                    setImages(res[0].url);
+                  }}
+                  onUploadError={() => {
+                    alert("something went wrong");
+                  }}
+                  endpoint="bannerImageRoute"
+                />
+              )}
+              <p className="text-red-500">{fields.imageString.errors}</p>
             </div>
           </div>
         </CardContent>
         <CardFooter>
-            <SubmitButton title="Create Banner" />
+          <SubmitButton title="Create Banner" />
         </CardFooter>
       </Card>
     </form>

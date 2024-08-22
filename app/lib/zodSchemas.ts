@@ -14,3 +14,10 @@ export const productSchema = z.object({
   category: z.enum(["men", "women", "kids"]),
   isFeatured: z.boolean().optional(),
 });
+
+export const bannerSchema = z.object({
+  title: z
+    .string()
+    .min(2, "Title is required and must be at least 2 characters"),
+  imageString: z.string(),
+});

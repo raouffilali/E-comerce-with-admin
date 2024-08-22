@@ -1,3 +1,4 @@
+import prisma from "@/app/lib/db";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -23,9 +24,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { MoreHorizontal, PlusCircle, User2 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
-export default function BannerRoute() {
+async function getData() {
+  const data = await prisma.banner.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+  return data;
+}
+
+export default async function BannerRoute() {
+  const data = await getData();
   return (
     <>
       <div className="flex items-center justify-end">
@@ -50,31 +62,42 @@ export default function BannerRoute() {
                 <TableHead className="text-end">Actions</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell>
-                  <User2 className="h-16 w-16" />
-                </TableCell>
-                <TableCell className="font-medium">Greate product</TableCell>
-                <TableCell className="text-end">
-                  {" "}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="icon" variant="ghost">
-                        <MoreHorizontal className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
 
-                      <DropdownMenuItem asChild>
-                        <Link href={`/dashboard/products/delete`}>Delete</Link>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
+            <TableBody>
+              {data.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell>
+                    <Image
+                      src={item.imageString}
+                      alt="Banner image"
+                      width={64}
+                      height={64}
+                      className="rounded-lg object-cover h-16 w-16"
+                    />
+                  </TableCell>
+                  <TableCell className="font-medium">{item.title}</TableCell>
+                  <TableCell className="text-end">
+                    {" "}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button size="icon" variant="ghost">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuItem asChild>
+                          <Link href={`/dashboard/banner/${item.id}/delete`}>
+                            Delete
+                          </Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </CardContent>
